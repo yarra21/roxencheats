@@ -4,11 +4,10 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Eye, EyeOff, Lock, User, Shield, AlertTriangle, Globe, Key } from "lucide-react"
+import { X, Eye, EyeOff, Lock, User, Shield, AlertTriangle, Globe } from 'lucide-react'
 import { useAuth } from "@/contexts/auth-context"
 import { addLog } from "@/services/log-service"
 import { authenticateAdmin } from "@/services/admin-service"
-// IP servisini import et
 import { getIpInfo, saveIpInfo } from "@/services/ip-service"
 
 interface AdminLoginProps {
@@ -20,9 +19,7 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
   const { login } = useAuth()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [adminKey, setAdminKey] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [showKey, setShowKey] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [ipAddress, setIpAddress] = useState("")
@@ -71,7 +68,7 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
     e.preventDefault()
     setError("")
 
-    if (!username || !password || !adminKey) {
+    if (!username || !password) {
       setError("Lütfen tüm alanları doldurun")
       return
     }
@@ -79,24 +76,23 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
     setIsLoading(true)
 
     try {
-      // Admin kimlik doğrulama
-      const admin = await authenticateAdmin(username, password, adminKey)
+      // Admin kimlik doğrulama - artık key parametresi yok
+      const admin = await authenticateAdmin(username, password)
 
       if (admin) {
         // IP bilgilerini al ve kaydet
         const ipInfo = await getIpInfo()
-        localStorage.setItem("roxen_admin_ip", ipInfo.ip)
-        localStorage.setItem("roxen_admin_ip_info", JSON.stringify(ipInfo))
+        localStorage.setItem("shield_admin_ip", ipInfo.ip)
+        localStorage.setItem("shield_admin_ip_info", JSON.stringify(ipInfo))
         await saveIpInfo("admin", username)
 
         // Admin girişi logunu kaydet
         await addLog("ADMIN_LOGIN", "admin", username, `Admin girişi yapıldı. IP: ${ipInfo.ip}`)
 
         // Admin bilgilerini kaydet
-        localStorage.setItem("roxen_admin_user", username)
-        localStorage.setItem("roxen_admin_auth", "true")
-        localStorage.setItem("roxen_admin_login_time", new Date().toISOString())
-        localStorage.setItem("roxen_admin_key", adminKey)
+        localStorage.setItem("shield_admin_user", username)
+        localStorage.setItem("shield_admin_auth", "true")
+        localStorage.setItem("shield_admin_login_time", new Date().toISOString())
 
         // Admin girişi başarılı
         onClose()
@@ -104,7 +100,7 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
         // Admin panelini otomatik olarak aç
         window.dispatchEvent(new CustomEvent("adminLoggedIn"))
       } else {
-        setError("Geçersiz kullanıcı adı, şifre veya key!")
+        setError("Geçersiz kullanıcı adı veya şifre!")
         setIsLoading(false)
       }
     } catch (error) {
@@ -130,31 +126,14 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="relative bg-gray-900/90 w-full max-w-md rounded-lg border border-yellow-500 overflow-hidden z-10"
+            className="relative bg-gradient-to-br from-gray-900 to-black w-full max-w-md rounded-lg border border-purple-500/30 overflow-hidden z-10 shadow-xl shadow-purple-500/20"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Glitch Effect Background */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-amber-600/20" />
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute h-px bg-yellow-400"
-                  style={{
-                    top: `${Math.random() * 100}%`,
-                    left: 0,
-                    right: 0,
-                    opacity: 0.3,
-                  }}
-                />
-              ))}
-            </div>
-
             {/* Header */}
             <div className="relative flex justify-between items-center p-4 border-b border-gray-800">
               <div className="flex items-center">
-                <Shield className="w-5 h-5 text-yellow-500 mr-2" />
-                <h2 className="text-xl font-bold text-yellow-500">Yönetici Girişi</h2>
+                <Shield className="w-5 h-5 text-purple-400 mr-2" />
+                <h2 className="text-xl font-bold text-white">Yönetici Girişi</h2>
               </div>
               <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
                 <X size={20} />
@@ -163,15 +142,15 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="relative p-6">
-              <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-md flex items-start">
-                <AlertTriangle className="w-5 h-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
+              <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-md flex items-start">
+                <AlertTriangle className="w-5 h-5 text-purple-400 mr-2 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-gray-300">
                   Bu alan sadece yetkili personel içindir. Yetkisiz giriş teşebbüsleri kaydedilmektedir.
                 </p>
               </div>
 
               <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-md flex items-center">
-                <Globe className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" />
+                <Globe className="w-5 h-5 text-blue-400 mr-2 flex-shrink-0" />
                 <div>
                   <p className="text-sm text-gray-300">IP Adresiniz:</p>
                   <p className="text-sm font-mono text-blue-400">{ipAddress || "Yükleniyor..."}</p>
@@ -192,7 +171,7 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
                       id="admin-username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 p-2.5"
+                      className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 p-2.5"
                       placeholder="Admin kullanıcı adı"
                     />
                   </div>
@@ -211,7 +190,7 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
                       id="admin-password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 pr-10 p-2.5"
+                      className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-10 p-2.5"
                       placeholder="Admin şifresi"
                     />
                     <button
@@ -224,44 +203,21 @@ export default function AdminLogin({ isOpen, onClose }: AdminLoginProps) {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="admin-key" className="block text-sm font-medium text-gray-300">
-                    Güvenlik Anahtarı
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <Key className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <input
-                      type={showKey ? "text" : "password"}
-                      id="CUSTOMER-19M3"
-                      value={adminKey}
-                      onChange={(e) => setAdminKey(e.target.value)}
-                      className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 pr-10 p-2.5"
-                      placeholder="12 karak1terli güvenlik anahtarı"
-                      maxLength={12}
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white"
-                      onClick={() => setShowKey(!showKey)}
-                    >
-                      {showKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
+                {error && (
+                  <div className="text-red-500 text-sm p-2 bg-red-500/10 border border-red-500/30 rounded-md">
+                    {error}
                   </div>
-                </div>
-
-                {error && <div className="text-red-500 text-sm">{error}</div>}
+                )}
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="button-hover w-full py-2.5 rounded-md bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-medium border border-yellow-500 flex items-center justify-center"
+                  className="w-full py-2.5 rounded-md bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium border border-purple-500/50 flex items-center justify-center transition-all duration-200"
                 >
                   {isLoading ? (
                     <div className="flex items-center">
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-black"
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

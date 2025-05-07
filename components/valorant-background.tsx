@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import Image from "next/image"
 import { motion } from "framer-motion"
 import { useAuth } from "@/contexts/auth-context"
 
@@ -28,53 +27,6 @@ export default function ValorantBackground() {
       {/* Parlama efektleri */}
       <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-purple-500/30 blur-3xl"></div>
-
-      {/* Yeni Valorant karakterleri */}
-      <motion.div
-        className="absolute top-0 right-0 w-1/2 h-screen pointer-events-none"
-        style={{
-          y: scrollY * 0.1,
-        }}
-      >
-        <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7UXhVIsAxGKEffjFH95AC8iViuoYQQ.png"
-          alt="Valorant Character"
-          fill
-          className="object-contain object-right"
-          priority
-        />
-      </motion.div>
-
-      <motion.div
-        className="absolute top-0 left-0 w-1/2 h-screen pointer-events-none"
-        style={{
-          y: scrollY * 0.05,
-        }}
-      >
-        <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-rQhWKbsFZiJj3nmKd79gxt7alTMaPn.png"
-          alt="Valorant Character"
-          fill
-          className="object-contain object-left"
-          priority
-        />
-      </motion.div>
-
-      {/* Fortnite karakterleri alt kısımda */}
-      <motion.div
-        className="absolute bottom-0 left-0 w-full h-1/2 pointer-events-none opacity-70"
-        style={{
-          y: scrollY * 0.15,
-        }}
-      >
-        <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-i4OJ5yMEJwhiFR35dXO9wb7LI2gfMp.png"
-          alt="Game Characters"
-          fill
-          className="object-contain object-bottom"
-          priority
-        />
-      </motion.div>
 
       {/* Yönetici girişi yapıldığında gösterilen yazı */}
       {isAdminUser && (

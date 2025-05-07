@@ -118,12 +118,12 @@ export default function SecurityProtection() {
               (args[0].includes("React DevTools") ||
                 args[0].includes("Warning:") ||
                 args[0].includes("Error:") ||
-                args[0].includes("ROXEN.AIM"))
+                args[0].includes("SHIELD SOFTWARE"))
             ) {
               return originalConsoleWarn.apply(console, args)
             }
 
-            originalConsoleWarn("⚠️ ROXEN.AIM GÜVENLİK SİSTEMİ: Konsol erişimi tespit edildi ve kaydedildi!")
+            originalConsoleWarn("⚠️ SHIELD SOFTWARE GÜVENLİK SİSTEMİ: Konsol erişimi tespit edildi ve kaydedildi!")
             detectSecurityViolation("CONSOLE_ACCESS", args.join(", "))
             return undefined
           }
@@ -328,7 +328,7 @@ export default function SecurityProtection() {
         <div style="position: fixed; inset: 0; background: black; color: red; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; font-family: monospace;">
           <h1 style="font-size: 3rem; margin-bottom: 1rem;">GÜVENLİK İHLALİ TESPİT EDİLDİ</h1>
           <p style="font-size: 1.5rem; margin-bottom: 2rem;">IP adresiniz ve sistem bilgileriniz kaydedildi.</p>
-          <p style="font-size: 1.2rem;">Bu olay ROXEN.AIM güvenlik ekibine bildirildi.</p>
+          <p style="font-size: 1.2rem;">Bu olay SHIELD SOFTWARE güvenlik ekibine bildirildi.</p>
           <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,0,0,0.1); border: 1px solid red; max-width: 80%; overflow-y: auto; max-height: 200px;">
             <p style="font-size: 1rem; color: #ff6666;">Tespit edilen ihlaller:</p>
             <ul style="text-align: left; color: #ff9999; font-size: 0.9rem;">

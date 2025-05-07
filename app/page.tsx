@@ -1,41 +1,26 @@
 "use client"
 
-import { Suspense, useState, useEffect, useRef, useCallback } from "react"
-import dynamic from "next/dynamic"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { useAuth } from "@/contexts/auth-context"
+import { saveSystemInfo } from "@/services/system-info-service"
 import Navbar from "@/components/navbar"
+import Hero from "@/components/hero"
 import Features from "@/components/features"
+import StatsSection from "@/components/stats-section"
+import ProductShowcase from "@/components/product-showcase"
+import Testimonials from "@/components/testimonials"
+import CTASection from "@/components/cta-section"
 import FAQ from "@/components/faq"
 import Footer from "@/components/footer"
-import { useAuth } from "@/contexts/auth-context"
+import LoginModal from "@/components/login-modal"
 import RegisterModal from "@/components/register-modal"
 import AdminLogin from "@/components/admin-login"
 import AdminDashboard from "@/components/admin-dashboard"
 import LogViewer from "@/components/log-viewer"
-import LoginModal from "@/components/login-modal"
 import SystemInfoModal from "@/components/system-info-modal"
-import { saveSystemInfo } from "@/services/system-info-service"
-
-// Dinamik olarak yükle
-const Hero = dynamic(() => import("@/components/hero"), { ssr: false })
-const FloatingIcons = dynamic(() => import("@/components/floating-icons"), { ssr: false })
-const MatrixRain = dynamic(() => import("@/components/matrix-rain"), { ssr: false })
-const GlitchEffect = dynamic(() => import("@/components/glitch-effect"), { ssr: false })
-const SecurityProtection = dynamic(() => import("@/components/security-protection"), { ssr: false })
-const UserActivityLogger = dynamic(() => import("@/components/user-activity-logger"), { ssr: false })
-
-// Basit güvenlik kontrolü - sayfanın yüklenmesini engellemeyecek
-const initBasicSecurity = () => {
-  if (typeof window !== "undefined") {
-    // İframe kontrolü
-    try {
-      if (window.self !== window.top) {
-        window.top.location = window.self.location
-      }
-    } catch (e) {
-      // Farklı domain'den iframe içinde
-    }
-  }
-}
+import SecurityProtection from "@/components/security-protection"
+import UserActivityLogger from "@/components/user-activity-logger"
+import BackgroundEffect from "@/components/background-effect"
 
 export default function Home() {
   const { user, isAdmin, login: authLogin } = useAuth()
@@ -50,17 +35,11 @@ export default function Home() {
   const securityInitializedRef = useRef(false)
   const systemInfoInitializedRef = useRef(false)
 
-  // login fonksiyonunu ekleyelim
+  // login fonksiyonu
   const login = useCallback(
     async (username: string, password: string) => {
       try {
         const result = await authLogin(username, password)
-
-        if (result.success) {
-          // Başarılı giriş
-          console.log("Giriş başarılı:", result.user)
-        }
-
         return result
       } catch (error) {
         console.error("Giriş hatası:", error)
@@ -70,14 +49,23 @@ export default function Home() {
     [authLogin],
   )
 
-  // Set mounted state when component mounts on client
+  // Component mount olduğunda
   useEffect(() => {
     setIsMounted(true)
 
-    // Basit güvenlik kontrollerini başlat
+    // Güvenlik kontrollerini başlat
     if (!securityInitializedRef.current) {
       securityInitializedRef.current = true
-      initBasicSecurity()
+      // Güvenlik kontrolleri
+      if (typeof window !== "undefined") {
+        try {
+          if (window.self !== window.top) {
+            window.top.location = window.self.location
+          }
+        } catch (e) {
+          // iframe içinde farklı domain
+        }
+      }
     }
 
     // Sistem bilgilerini topla
@@ -94,42 +82,23 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Kullanıcı bilgilerini kaydet - only on client side
+  // Kullanıcı bilgilerini kaydet
   useEffect(() => {
-    if (!isMounted) return
+    if (!isMounted || !user) return
 
-    // Sayfa yüklendiğinde kullanıcı bilgilerini kaydet
     const captureVisit = async () => {
       try {
         const { saveIpInfo } = await import("@/services/ip-service")
-        await saveIpInfo(user?.id, user?.username)
+        await saveIpInfo(user.id, user.username)
       } catch (error) {
         console.error("Ziyaret kaydedilemedi:", error)
       }
     }
 
-    if (user) {
-      captureVisit()
-    }
+    captureVisit()
   }, [user, isMounted])
 
-  const openRegisterModal = () => {
-    setRegisterModalOpen(true)
-  }
-
-  const openLoginModal = () => {
-    setLoginModalOpen(true)
-  }
-
-  const openAdminLogin = () => {
-    setAdminLoginOpen(true)
-  }
-
-  const openSystemInfo = () => {
-    setSystemInfoOpen(true)
-  }
-
-  // Admin giriş olayını dinleyen bir useEffect ekleyelim
+  // Admin giriş olayını dinle
   useEffect(() => {
     if (!isMounted) return
 
@@ -138,16 +107,33 @@ export default function Home() {
     }
 
     window.addEventListener("adminLoggedIn", handleAdminLogin)
-
-    return () => {
-      window.removeEventListener("adminLoggedIn", handleAdminLogin)
-    }
+    return () => window.removeEventListener("adminLoggedIn", handleAdminLogin)
   }, [isMounted])
 
-  // openAdminDashboard fonksiyonunu güncelleyelim
-  const openAdminDashboard = () => {
-    const isAdminAuthenticated = localStorage.getItem("roxen_admin_auth") === "true"
+  // Kayıt sonrası otomatik giriş
+  useEffect(() => {
+    if (!isMounted) return
 
+    const handleUserRegistered = (event: any) => {
+      const { username, password } = event.detail
+      if (username && password) {
+        login(username, password).catch((error) => {
+          console.error("Otomatik giriş başarısız:", error)
+        })
+      }
+    }
+
+    window.addEventListener("userRegistered", handleUserRegistered as EventListener)
+    return () => window.removeEventListener("userRegistered", handleUserRegistered as EventListener)
+  }, [isMounted, login])
+
+  const openRegisterModal = () => setRegisterModalOpen(true)
+  const openLoginModal = () => setLoginModalOpen(true)
+  const openAdminLogin = () => setAdminLoginOpen(true)
+  const openSystemInfo = () => setSystemInfoOpen(true)
+
+  const openAdminDashboard = () => {
+    const isAdminAuthenticated = localStorage.getItem("shield_admin_auth") === "true"
     if (isAdminAuthenticated || isAdmin()) {
       setAdminDashboardOpen(true)
     } else {
@@ -163,73 +149,41 @@ export default function Home() {
     }
   }
 
-  // Kayıt sonrası otomatik giriş için useEffect ekleyelim
-  useEffect(() => {
-    if (!isMounted) return
-
-    const handleUserRegistered = (event: any) => {
-      const { username, password } = event.detail
-      // Otomatik giriş yap
-      if (username && password) {
-        // Giriş işlemini gerçekleştir
-        const autoLogin = async () => {
-          try {
-            await login(username, password)
-          } catch (error) {
-            console.error("Otomatik giriş başarısız:", error)
-          }
-        }
-
-        autoLogin()
-      }
-    }
-
-    window.addEventListener("userRegistered", handleUserRegistered as EventListener)
-
-    return () => {
-      window.removeEventListener("userRegistered", handleUserRegistered as EventListener)
-    }
-  }, [isMounted, login])
-
   // Yükleme ekranı
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900 to-black flex items-center justify-center z-50">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4 text-purple-500 animate-pulse">SHIELD SOFTWARE</h1>
-          <p className="text-white">Yükleniyor...</p>
-          <div className="mt-4 w-16 h-16 border-4 border-t-purple-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin mx-auto"></div>
+          <h1 className="text-4xl font-bold mb-4 text-white">
+            <span className="text-purple-400">SHIELD</span> SOFTWARE
+          </h1>
+          <p className="text-gray-300 mb-6">Güvenlik Çözümleri</p>
+          <div className="w-16 h-16 border-4 border-t-purple-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* Hacker tarzı arka plan */}
-      <Suspense fallback={<div className="h-full w-full bg-black" />}>
-        <div className="fixed inset-0 z-0">
-          {isMounted && (
-            <>
-              <MatrixRain />
-              <GlitchEffect />
-            </>
-          )}
-        </div>
-      </Suspense>
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-900 to-black text-white">
+      {/* Arka plan efekti */}
+      <BackgroundEffect />
 
       {/* Kullanıcı Aktivite Logları */}
       {isMounted && <UserActivityLogger />}
 
-      {/* Güvenlik Koruması - Her zaman aktif */}
+      {/* Güvenlik Koruması */}
       {isMounted && !isAdmin() && <SecurityProtection />}
 
-      {/* Content */}
-      <div className="relative z-30">
+      {/* İçerik */}
+      <div className="relative z-10">
         <Navbar onOpenLogin={openLoginModal} onOpenRegister={openRegisterModal} onOpenAdminLogin={openAdminLogin} />
-        <Hero />
-        {isMounted && <FloatingIcons />}
+        <Hero onRegister={openRegisterModal} />
+        <StatsSection />
         <Features />
+        <ProductShowcase />
+        <Testimonials />
+        <CTASection onRegister={openRegisterModal} />
         <FAQ />
         <Footer
           onOpenAdminLogin={openAdminDashboard}
@@ -238,7 +192,7 @@ export default function Home() {
         />
       </div>
 
-      {/* Modals - only render on client side */}
+      {/* Modaller */}
       {isMounted && (
         <>
           <RegisterModal isOpen={registerModalOpen} onClose={() => setRegisterModalOpen(false)} />

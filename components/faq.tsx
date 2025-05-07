@@ -33,8 +33,7 @@ export default function FAQ() {
     },
     {
       question: "Teknik destek alabilir miyim?",
-      answer:
-        "Evet, 7/24 teknik destek hizmetimiz bulunmaktadır. Discord sunucumuza katılarak veya iletişim formumuz aracılığıyla bize ulaşabilirsiniz.",
+      answer: "Evet, 7/24 teknik destek hizmetimiz bulunmaktadır. İletişim formumuz aracılığıyla bize ulaşabilirsiniz.",
     },
     {
       question: "Ödeme yöntemleri nelerdir?",
@@ -54,15 +53,14 @@ export default function FAQ() {
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-bold mb-4"
           >
-            <span className="neon-text">SIKÇA</span>{" "}
-            <span className="text-purple-500 neon-text-purple">SORULAN SORULAR</span>
+            <span className="text-white">SIKÇA</span> <span className="text-purple-400">SORULAN SORULAR</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-gray-400 max-w-2xl mx-auto"
+            className="text-gray-300 max-w-2xl mx-auto"
           >
             Merak ettiğiniz soruların cevaplarını burada bulabilirsiniz
           </motion.p>
@@ -83,7 +81,7 @@ export default function FAQ() {
                 className={`w-full text-left p-4 rounded-lg flex justify-between items-center transition-all duration-300 ${
                   openIndex === index
                     ? "bg-purple-900/30 border border-purple-500/50"
-                    : "bg-gray-900/50 border border-gray-800 hover:border-purple-500/30"
+                    : "bg-black/30 border border-gray-800 hover:border-purple-500/30"
                 }`}
               >
                 <span className="font-medium text-lg">{faq.question}</span>
@@ -99,7 +97,7 @@ export default function FAQ() {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-gray-800/50 p-4 rounded-b-lg border-x border-b border-purple-500/30 text-gray-300"
+                  className="bg-black/20 p-4 rounded-b-lg border-x border-b border-purple-500/30 text-gray-300"
                 >
                   {faq.answer}
                 </motion.div>
