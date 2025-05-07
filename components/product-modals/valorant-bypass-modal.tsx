@@ -1,0 +1,215 @@
+"use client"
+
+import { useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { X, Check, ArrowRight } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+
+interface ValorantBypassModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function ValorantBypassModal({ isOpen, onClose }: ValorantBypassModalProps) {
+  // ESC tuşuna basıldığında modalı kapat
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", handleEsc)
+    return () => window.removeEventListener("keydown", handleEsc)
+  }, [onClose])
+
+  // Modal açıkken body scroll'u engelle
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+    return () => {
+      document.body.style.overflow = "auto"
+    }
+  }, [isOpen])
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            onClick={onClose}
+          />
+
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            className="relative bg-gray-900/90 w-full max-w-4xl max-h-[90vh] rounded-lg border border-purple-500 overflow-hidden z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Animasyonlu arka plan */}
+            <div className="absolute inset-0 overflow-hidden">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"
+                  style={{
+                    top: `${20 + i * 15}%`,
+                    left: 0,
+                    right: 0,
+                  }}
+                  animate={{
+                    x: ["-100%", "100%"],
+                    opacity: [0.1, 0.5, 0.1],
+                  }}
+                  transition={{
+                    duration: 2 + i,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "linear",
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Header */}
+            <div className="relative flex justify-between items-center p-6 border-b border-gray-800">
+              <h2 className="text-2xl font-bold text-purple-500">VALORANT VANGUARD BYPASS</h2>
+              <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="relative overflow-y-auto p-6" style={{ maxHeight: "calc(90vh - 80px)" }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold mb-4 text-white">VALORANT VANGUARD BYPASS</h3>
+                    <p className="text-gray-300 mb-4">
+                      Valorant'ın güçlü anti-cheat sistemi Vanguard'ı bypass ederek, oyun deneyiminizi istediğiniz gibi
+                      özelleştirmenize olanak tanıyan gelişmiş çözümümüz.
+                    </p>
+                  </div>
+
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-purple-400">Özellikler</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-white">Bilgisayarınızın Delayını Kaldırır</span>
+                          <p className="text-sm text-gray-400">
+                            Oyun içi gecikmeleri en aza indirerek daha akıcı bir oyun deneyimi sunar.
+                          </p>
+                        </div>
+                      </li>
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-white">Vanguardı Devre Dışı Bırakır</span>
+                          <p className="text-sm text-gray-400">
+                            Vanguard'ın sistem üzerindeki kısıtlamalarını kaldırarak tam kontrol sağlar.
+                          </p>
+                        </div>
+                      </li>
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-white">Undetected Hile Kullanımı</span>
+                          <p className="text-sm text-gray-400">
+                            İstediğiniz bedava hileleri tespit edilmeden kullanabilirsiniz.
+                          </p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-purple-400">Desteklenen Sistemler</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Windows 10 Tüm Sürümler</span>
+                      </li>
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Windows 11 Tüm Sürümler</span>
+                      </li>
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Intel/Amd İşlemciler</span>
+                      </li>
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Tüm Ekran Modları (Pencereli, Çerçevesiz, Tam Ekran)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <Check className="w-5 h-5 mr-2 text-green-400 mt-1 flex-shrink-0" />
+                        <span>Tüm Çözünürlükler</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="bg-gray-800/70 rounded-lg p-6 border border-purple-500/50 mb-6">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-purple-400">Fiyatlandırma</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center pb-3 border-b border-gray-700">
+                        <span className="text-white">Haftalık</span>
+                        <span className="text-xl font-bold text-white">1400 ₺</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-white">Aylık</span>
+                        <span className="text-xl font-bold text-white">2300 ₺</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-800/70 rounded-lg overflow-hidden mb-6">
+                    <Image
+                      src="/placeholder.svg?height=300&width=500"
+                      alt="Vanguard Bypass Arayüzü"
+                      width={500}
+                      height={300}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="bg-gray-800/70 rounded-lg p-6 border border-gray-700">
+                    <h3 className="text-lg font-semibold mb-4 text-white">Nasıl Çalışır?</h3>
+                    <p className="text-gray-300 mb-4">
+                      Vanguard Bypass, Valorant'ın anti-cheat sistemini devre dışı bırakarak çalışır. Kernel seviyesinde
+                      çalışan özel algoritmamız, Vanguard'ın sistem taramalarını atlatarak güvenli bir ortam oluşturur.
+                    </p>
+                    <p className="text-gray-300">
+                      Kurulum sonrası tek tıkla aktifleştirebilir ve anında Valorant'ı oynamaya başlayabilirsiniz.
+                      Otomatik güncelleme sistemi sayesinde her zaman en güncel korumaya sahip olursunuz.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-center mt-8">
+                <Link
+                  href="https://discord.gg/XECCS2EdWr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-3 rounded-md bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-500 hover:to-pink-500 transition-colors flex items-center"
+                >
+                  HEMEN SATIN AL <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  )
+}
