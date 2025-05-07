@@ -3,13 +3,13 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
-import ClientSecurityProvider from "./client-security-provider"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Shield Software | Güvenlik Çözümleri",
-  description: "Gelişmiş güvenlik çözümleri ile sistemlerinizi koruyun",
+  title: "SHIELD SOFTWARE",
+  description: "Premium gaming software solutions",
     generator: 'v0.dev'
 }
 
@@ -19,11 +19,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="tr" className="scroll-smooth">
+    <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <ClientSecurityProvider>{children}</ClientSecurityProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
